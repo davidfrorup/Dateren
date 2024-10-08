@@ -1,0 +1,49 @@
+﻿@page "/users/create"
+@using Microsoft.EntityFrameworkCore
+@using Dateren.Model
+@inject IDbContextFactory<Dateren.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>User</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="User" OnValidSubmit="AddUser" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="navn" class="form-label">Navn:</label> 
+                <InputText id="navn" @bind-Value="User.Navn" class="form-control" /> 
+                <ValidationMessage For="() => User.Navn" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="alder" class="form-label">Alder:</label> 
+                <InputNumber id="alder" @bind-Value="User.Alder" class="form-control" /> 
+                <ValidationMessage For="() => User.Alder" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/users">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private User User { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddUser()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Users.Add(User);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/users");
+    }
+}
